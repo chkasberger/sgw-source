@@ -291,12 +291,12 @@ int Modbus::updateModbusMap(modbus_mapping_t *mb_mapping, list<Register*> *l, ui
 					});
 				}
 				pthread_mutex_unlock(m_mtx);
-
+				returnValue = 0;
 				break;
 			case 0x10:
 				pthread_mutex_lock(m_mtx);
 				{
-
+					returnValue = -1;
 				}
 				pthread_mutex_unlock(m_mtx);
 				break;
@@ -328,7 +328,7 @@ int Modbus::updateModbusMap(modbus_mapping_t *mb_mapping, list<Register*> *l, ui
 				break;
 		}
 	}
-	return (0);
+	return (returnValue);
 }
 
 Modbus::~Modbus() {
