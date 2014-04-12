@@ -1,0 +1,6 @@
+eclipse.preferences.version=1
+environment/project/cdt.managedbuild.config.gnu.cross.exe.debug.1641418741.563587862/PATH/delimiter=\:
+environment/project/cdt.managedbuild.config.gnu.cross.exe.debug.1641418741.563587862/PATH/operation=replace
+environment/project/cdt.managedbuild.config.gnu.cross.exe.debug.1641418741.563587862/PATH/value=//home/ptse/tool/Raspberry-GCC-4.7.3/trunk/arm-unknown-linux-gnueabi/bin\:/usr/local/sbin\:/usr/local/bin\:/usr/sbin\:/usr/bin\:/sbin\:/bin
+environment/project/cdt.managedbuild.config.gnu.cross.exe.debug.1641418741.563587862/append=true
+environment/project/cdt.managedbuild.config.gnu.cross.exe.debug.1641418741.563587862/appendContributed=true
