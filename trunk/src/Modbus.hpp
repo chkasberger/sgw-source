@@ -15,7 +15,8 @@
 #include <stdlib.h>
 #include <errno.h>
 #include <time.h>
-#include </usr/include/modbus/modbus.h>
+//#include </usr/include/modbus/modbus.h>
+#include </usr/local/include/modbus/modbus.h>
 //#include <modbus/modbus.h>
 #include <math.h>
 #include <sys/types.h>
@@ -34,7 +35,7 @@ namespace sgw {
 
 class Modbus {
 public:
-	bool DEBUG = true;
+	bool DEBUG = false;
 	Modbus();
 	virtual ~Modbus();
 	void openServer(const char *mode, const char *port, pthread_mutex_t *mtx, list<Register*> *l);

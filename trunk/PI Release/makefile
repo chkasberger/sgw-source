@@ -44,7 +44,7 @@ all: SGW
 SGW: $(OBJS) $(USER_OBJS)
 	@echo 'Building target: $@'
 	@echo 'Invoking: Cross G++ Linker'
-	arm-unknown-linux-gnueabi-g++ -L/home/ptse/tool/Raspberry-GCC-4.7.3/rootfs/usr/lib -L/home/ptse/tool/Raspberry-GCC-4.7.3/rootfs/lib -o "SGW" $(OBJS) $(USER_OBJS) $(LIBS) -lmodbus -std=c++11 -lpthread
+	arm-unknown-linux-gnueabi-g++ -L/home/ptse/tool/Raspberry-GCC-4.7.3/rootfs/usr/local/lib -L/home/ptse/tool/Raspberry-GCC-4.7.3/rootfs/usr/lib -L/home/ptse/tool/Raspberry-GCC-4.7.3/rootfs/lib -o "SGW" $(OBJS) $(USER_OBJS) $(LIBS) -lmodbus -std=c++11 -lpthread
 	@echo 'Finished building target: $@'
 	@echo ' '
 

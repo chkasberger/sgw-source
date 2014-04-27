@@ -16,6 +16,7 @@ namespace sgw {
 
 enum ModbusMode {TCP, RTU};
 enum SocketState {CLOSED=0, OPEN};
+int slaveAddress = 20;
 int socket = -1;
 int socketState = CLOSED;
 int m_Connections = 3;
@@ -53,6 +54,7 @@ void Modbus::closeServer(){
 
 	modbus_close(ctx); // close
 	modbus_free(ctx);
+
 	ctx = NULL;
 }
 
@@ -88,7 +90,7 @@ int Modbus::setupModbusConnection(){
 				cout << "could not allocate ctx\r" << endl;
 			else{
 				//modbus_set_slave(ctx, 3);
-				modbus_set_error_recovery(ctx,(modbus_error_recovery_mode)(MODBUS_ERROR_RECOVERY_LINK));
+				//modbus_set_error_recovery(ctx,(modbus_error_recovery_mode)(MODBUS_ERROR_RECOVERY_LINK));
 				if(socketState == CLOSED){
 					socket = modbus_tcp_listen(ctx, m_Connections);
 					if(socket <= 0)
@@ -114,8 +116,8 @@ int Modbus::setupModbusConnection(){
 		case RTU:
 			max_adu_length = MODBUS_RTU_MAX_ADU_LENGTH;
 			ctx = modbus_new_rtu(m_Port, 9600, 'N', 8, 1);
-			//modbus_rtu_set_serial_mode(ctx, MODBUS_RTU_RS485);
-			modbus_set_slave(ctx, 20);
+			modbus_rtu_set_serial_mode(ctx, MODBUS_RTU_RS485);
+			modbus_set_slave(ctx, slaveAddress);
 
 			if(DEBUG) cout << "Waiting for RTU connection on Port: " << m_Port << "\r" << endl;
 			returnValue = modbus_connect(ctx);
@@ -125,7 +127,7 @@ int Modbus::setupModbusConnection(){
 			break;
 	}
 
-	modbus_set_debug(ctx, DEBUG);
+	//modbus_set_debug(ctx, DEBUG);
     return (returnValue);
 }
 
@@ -215,27 +217,31 @@ void Modbus::listenModbusConnectionRTU(){
 
 		if (rc >= 0)
 		{
-			int nToShow = 10;//(query[4]<<8 || query[5]);
+			if(query[0] == slaveAddress){
+				if(DEBUG) cout << "Modbus::listenModbusConnection: " << "got frame with my slave address!\r" << endl;
+				int nToShow = 10;//(query[4]<<8 || query[5]);
 
-			updateModbusMap(mb_mapping, m_RegisterList, query); // every request we want a new set of cards
+				updateModbusMap(mb_mapping, m_RegisterList, query); // every request we want a new set of cards
 
-			if(DEBUG){
-				cout << "Replying to request num bytes= " << hex << rc << ": ";
-				for(int i=0;i<rc;i++)
-				  cout << setw(2) << setfill('0') << hex << (short)query[i];
-				cout << "\r" << endl;
+				if(DEBUG){
+					cout << "Replying to request num bytes= " << hex << rc << ": ";
+					for(int i=0;i<rc;i++)
+					  cout << setw(2) << setfill('0') << hex << (short)query[i];
+					cout << "\r" << endl;
+				}
+
+				int received = modbus_reply(ctx, query, rc, mb_mapping);
+				if(DEBUG){
+					if(received < 0) cout << "Modbus::listenModbusConnection: " << modbus_strerror(errno) << "\r" << endl;
+
+					cout << "tab_registers =";
+					for(int i=45000;i<nToShow;i++)
+						cout << " " << hex << mb_mapping->tab_registers[i];
+					cout << "\r" << endl;
+				}
 			}
-
-			int received = modbus_reply(ctx, query, rc, mb_mapping);
-			if(DEBUG){
-				if(received < 0) cout << "Modbus::listenModbusConnection: " << modbus_strerror(errno) << "\r" << endl;
-
-				cout << "tab_registers =";
-				for(int i=45000;i<nToShow;i++)
-					cout << " " << hex << mb_mapping->tab_registers[i];
-				cout << "\r" << endl;
-			}
-
+			else
+				if(DEBUG) cout << "Modbus::listenModbusConnection: " << "got frame that does not belong to me!\r" << endl;
 		} else {
 			if(DEBUG) cout << "Modbus::listenModbusConnection: " << modbus_strerror(errno) << "\r" << endl;
 
@@ -264,9 +270,9 @@ int Modbus::updateModbusMap(modbus_mapping_t *mb_mapping, list<Register*> *l, ui
 	int returnValue = -1;
 	if(mb_mapping != NULL && subSequence != NULL){
 		mb_mapping->tab_registers[44999]++; // increment the holding reg 0 for each read
+		int modbusRegisterAddress, modbusRegisterAddressEnd, modbusRegisterLegth;
 		switch (subSequence[1]) {
 			case 0x06:
-				int modbusRegisterAddress;// = (subSequence[2]) | (subSequence[3] << 8);
 				modbusRegisterAddress = (subSequence[2] << 8) | (subSequence[3]);
 				pthread_mutex_lock(m_mtx);
 				{
@@ -277,16 +283,9 @@ int Modbus::updateModbusMap(modbus_mapping_t *mb_mapping, list<Register*> *l, ui
 							int address = currentRegister->r_ModbusAddress;
 							if(address == modbusRegisterAddress){
 								//short value = 0x0000;
-								currentRegister->r_RawData[0] = (char)(mb_mapping->tab_registers[address] & 0x00ff);
-								currentRegister->r_RawData[1] = (char)((mb_mapping->tab_registers[address] & 0xff00) >> 8);
+								currentRegister->r_RawData[1] = (char)(mb_mapping->tab_registers[address] & 0x00ff);
+								currentRegister->r_RawData[0] = (char)((mb_mapping->tab_registers[address] & 0xff00) >> 8);
 							}
-
-							short value = 0x0000;
-							value = currentRegister->r_RawData[1] & 0x00ff;
-							value += (currentRegister->r_RawData[0] *0x100);
-							//if(DEBUG) cout << "Modbus::updateModbusConnection: with value " << value << "\r" << endl;
-							mb_mapping->tab_registers[address] = value;
-							//if(DEBUG) cout << "Modbus::updateModbusConnection: now value " << dec << mb_mapping->tab_registers[address] << "\r" << endl;
 						}
 					});
 				}
@@ -294,11 +293,29 @@ int Modbus::updateModbusMap(modbus_mapping_t *mb_mapping, list<Register*> *l, ui
 				returnValue = 0;
 				break;
 			case 0x10:
+				modbusRegisterAddress = (subSequence[2] << 8) | (subSequence[3]);
+				modbusRegisterLegth = (subSequence[4] << 8) | (subSequence[5]);
+				modbusRegisterAddressEnd = modbusRegisterAddress + modbusRegisterLegth - 1;
+
 				pthread_mutex_lock(m_mtx);
 				{
-					returnValue = -1;
+					for_each(l->begin(),l->end(),[mb_mapping, modbusRegisterAddressEnd](Register* currentRegister)
+						{
+							if(currentRegister != NULL){
+								//cout << "Modbus::updateModbusConnection: copy register " << currentRegister->r_ModbusAddress;
+								int address = currentRegister->r_ModbusAddress;
+								if(address <= modbusRegisterAddressEnd){
+									//short value = 0x0000;
+									cout << mb_mapping->tab_registers[address] << "\r" << endl;
+									currentRegister->r_RawData[1] = (char)(mb_mapping->tab_registers[address] & 0x00ff);
+									currentRegister->r_RawData[0] = (char)((mb_mapping->tab_registers[address] & 0xff00) >> 8);
+								}
+							}
+						});
+
 				}
 				pthread_mutex_unlock(m_mtx);
+				returnValue = -1;
 				break;
 			case 0x03:
 				//if(DEBUG) cout << "Modbus::updateModbusConnection: increment byte 0 of mb_mapping!\r" << endl;
