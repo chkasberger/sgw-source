@@ -42,7 +42,7 @@ char *updateRegister(Register *r){
 	if(r != NULL){
 		bool readRegister = false;
 		time_t timeStamp = time(NULL);
-		char resultValues[3];
+		char resultValues[]{0x00, 0x00, 0x00};
 		char *result = &resultValues[0];
 
 		if(r->r_ReadWrite == Register::Read){
@@ -67,7 +67,7 @@ char *updateRegister(Register *r){
 					break;
 			}
 			if(readRegister || r->r_Count <= 0){
-				char readFrame[]{0x02, 0x10, 0x20, 0x30, 0x40, 0x50, 0x03, 0x00};
+				char readFrame[]{(char)0x02, (char)0x10, (char)0x20, (char)0x30, (char)0x40, (char)0x50, (char)0x03, (char)0x00};
 				char *readPntr = &readFrame[0];
 				char scsCommand = r->r_ScsCommand;
 
@@ -95,7 +95,7 @@ char *updateRegister(Register *r){
 			}
 		}
 		if(r->r_ReadWrite == Register::Write && r->r_Count < 0){
-			char writeFrame[]{0x02, 0x10, 0x20, 0x30, 0x40, 0x50, 0x60, 0x70, 0x80, 0x90, 0x03, 0x00};
+			char writeFrame[]{(char)0x02, (char)0x10, (char)0x20, (char)0x30, (char)0x40, (char)0x50, (char)0x60, (char)0x70, (char)0x80, (char)0x90, (char)0x03, (char)0x00};
 			char *writePntr = &writeFrame[0];
 			char scsCommand = r->r_ScsCommand;
 
@@ -275,10 +275,16 @@ int main(int argc, char *argv[]) {
 		if(c == 'n'){
 			DEBUG = false;
 		}
-		usleep(1000000);
-		updateAllRegister(&m_Map.m_registerListController);
-		//usleep(500000);
-		//updateAllRegister(&m_Map.m_registerListModule);
+
+		//if(c!='m'){
+			usleep(500000);
+			updateAllRegister(&m_Map.m_registerListController);
+		//}
+		//if(c=='m'){
+		if(DEBUG){
+			usleep(500000);
+			updateAllRegister(&m_Map.m_registerListModule);
+		}
 
 		/*for(unsigned int i = 0; i < 2; i++)
 		if (pthread_kill(threadArray[i], 0) == ESRCH){

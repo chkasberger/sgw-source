@@ -46,10 +46,10 @@ private:
 	Register Voltage = 				Register("Voltage",			45013,1,0x09,Register::Read,Register::Unsigned,Register::High,Register::Controller,0);
 	Register Current = 				Register("Current",			45014,1,0x0A,Register::Read,Register::Signed,Register::High,Register::Controller,0);
 	Register SysWarning = 			Register("SysWarning",		45015,1,0x48,Register::Read,Register::Undefined,Register::Medium,Register::Controller,0);
-	Register SysMaxCellVoltage = 	Register("SysMaxCellVoltage",45016,1,0x46,Register::Read,Register::Unsigned,Register::Medium,Register::Controller,0);
-	Register SysMinCellVoltage = 	Register("SysMinCellVoltage",45017,1,0x47,Register::Read,Register::Unsigned,Register::Medium,Register::Controller,0);
+	Register SysMaxCellVoltage = 	Register("SysMaxCellVoltage",45016,1,0x46,Register::Read,Register::Unsigned,Register::High,Register::Controller,0);
+	Register SysMinCellVoltage = 	Register("SysMinCellVoltage",45017,1,0x47,Register::Read,Register::Unsigned,Register::High,Register::Controller,0);
 	Register Temperature = 			Register("Temperature",		45018,1,0x08,Register::Read,Register::Unsigned,Register::Medium,Register::Controller,0);
-	Register RelativeStateOfCharge = Register("RelativeStateOfCharge",45019,1,0x0D,Register::Read,Register::Unsigned,Register::Medium,Register::Controller,0);
+	Register RelativeStateOfCharge = Register("RelativeStateOfCharge",45019,1,0x0D,Register::Read,Register::Unsigned,Register::High,Register::Controller,0);
 	Register RemainCapacity = 		Register("RemainCapacity",	45020,1,0x0F,Register::Read,Register::Unsigned,Register::Medium,Register::Controller,0);
 	Register FullChargeCapacity = 	Register("FullChargeCapacity",45021,1,0x10,Register::Read,Register::Unsigned,Register::Low,Register::Controller,0);
 	Register AverageCurrent = 		Register("AverageCurrent",	45022,1,0x0B,Register::Read,Register::Signed,Register::Low,Register::Controller,0);

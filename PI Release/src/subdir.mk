@@ -29,7 +29,7 @@ CPP_DEPS += \
 src/%.o: ../src/%.cpp
 	@echo 'Building file: $<'
 	@echo 'Invoking: Cross G++ Compiler'
-	arm-unknown-linux-gnueabi-g++ -I/home/ptse/tool/Raspberry-GCC-4.7.3/rootfs/usr/lib -I/home/ptse/tool/Raspberry-GCC-4.7.3/rootfs/lib -O0 -g3 -Wall -c -fmessage-length=0 -MMD -MP -MF"$(@:%.o=%.d)" -MT"$(@:%.o=%.d)" -o "$@" "$<" -lmodbus -std=c++11 -lpthread
+	arm-unknown-linux-gnueabi-g++ -I/home/ptse/tool/Raspberry-GCC-4.7.3/rootfs/usr/local/lib -I/home/ptse/tool/Raspberry-GCC-4.7.3/rootfs/usr/lib -I/home/ptse/tool/Raspberry-GCC-4.7.3/rootfs/lib -O0 -g3 -Wall -c -fmessage-length=0 -MMD -MP -MF"$(@:%.o=%.d)" -MT"$(@:%.o=%.d)" -o "$@" "$<" -lmodbus -std=c++11 -lpthread
 	@echo 'Finished building: $<'
 	@echo ' '
 
