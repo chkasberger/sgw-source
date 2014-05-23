@@ -127,7 +127,8 @@ int Modbus::setupModbusConnection(){
 			break;
 	}
 
-	//modbus_set_debug(ctx, DEBUG);
+	//if(DEBUG)
+		//modbus_set_debug(ctx, DEBUG);
     return (returnValue);
 }
 
@@ -185,6 +186,44 @@ void Modbus::listenModbusConnectionTCP(){
 				if (rc > 0) {
 					if(query[7] == 0x03 || 0x06 || 0x10){
 						subSequence = &query[06];
+						/*if(dummy){
+							mb_mapping->tab_registers[45000] = 0x0000;	// 	DesignCapacity		0	0
+							mb_mapping->tab_registers[45001] = 0x0c00;	// 	DesignVoltage		3072	3072
+							mb_mapping->tab_registers[45002] = 0x435f;	// 	ManufactureDate		17247	17247
+							mb_mapping->tab_registers[45003] = 0x0012;	// 	SerialNumber		18	18
+							mb_mapping->tab_registers[45004] = 0x534f;	// 	ManufactureName		21327	21327
+							mb_mapping->tab_registers[45005] = 0x4335;	// 	DeviceName		17205	17205
+							mb_mapping->tab_registers[45006] = 0x4c46;	// 	DeviceChemistry		19526	19526
+							mb_mapping->tab_registers[45007] = 0x5001;	// 	ModelName		20481	20481
+							mb_mapping->tab_registers[45008] = 0x003f;	// 	ConnectedModuleInfo		63	63
+							mb_mapping->tab_registers[45009] = 0x1217;	// 	ControllerInfo		4631	4631
+							mb_mapping->tab_registers[45010] = 0x1701;	// 	FirmwareVersion		5889	5889
+							mb_mapping->tab_registers[45011] = 0x0010;	// 	Status		16	16
+							mb_mapping->tab_registers[45012] = 0x00c0;	// 	BatteryStatus		192	192
+							mb_mapping->tab_registers[45013] = 0x0c48;	// 	Voltage		3144	3144
+							mb_mapping->tab_registers[45014] = 0xffac;	// 	Current		-84	65452
+							mb_mapping->tab_registers[45015] = 0x0000;	// 	SysWarning		0	0
+							mb_mapping->tab_registers[45016] = 0x0cce;	// 	SysMaxCellVoltage		3278	3278
+							mb_mapping->tab_registers[45017] = 0x0cc8;	// 	SysMinCellVoltage		3272	3272
+							mb_mapping->tab_registers[45018] = 0x0b8e;	// 	Temperature		2958	2958
+							mb_mapping->tab_registers[45019] = 0x0027;	// 	RelativeStateOfCharge		39	39
+							mb_mapping->tab_registers[45020] = 0x03a2;	// 	RemainCapacity		930	930
+							mb_mapping->tab_registers[45021] = 0x0960;	// 	FullChargeCapacity		2400	2400
+							mb_mapping->tab_registers[45022] = 0xffc1;	// 	AverageCurrent		-63	65473
+							mb_mapping->tab_registers[45023] = 0x0960;	// 	ChargingCurrent		2400	2400
+							mb_mapping->tab_registers[45024] = 0x0d80;	// 	ChargingVoltage		3456	3456
+							mb_mapping->tab_registers[45025] = 0x002d;	// 	CycleCount		45	45
+							mb_mapping->tab_registers[45026] = 0x0000;	// 	HeaterStatus		0	0
+							mb_mapping->tab_registers[45027] = 0x0000;	// 	FANStatus		0	0
+							mb_mapping->tab_registers[45028] = 0x0ba9;	// 	SysMaxCellTemp		2985	2985
+							mb_mapping->tab_registers[45029] = 0x0b6a;	// 	SysMinCellTemp		2922	2922
+							mb_mapping->tab_registers[45030] = 0x0c00;	// 	HeatsinkTemperature		3072	3072
+							mb_mapping->tab_registers[45031] = 0xffff;	// 	IGBTControl		-1	65535
+							mb_mapping->tab_registers[45032] = 0x030f;	// 	IGBTStatus		783	783
+						}
+						else{
+							updateModbusMap(mb_mapping, m_RegisterList, subSequence); // every request we want a new set of cards
+						}*/
 						updateModbusMap(mb_mapping, m_RegisterList, subSequence); // every request we want a new set of cards
 					}
 					modbus_reply(ctx, query, rc, mb_mapping);
@@ -220,6 +259,46 @@ void Modbus::listenModbusConnectionRTU(){
 			if(query[0] == slaveAddress){
 				if(DEBUG) cout << "Modbus::listenModbusConnection: " << "got frame with my slave address!\r" << endl;
 				int nToShow = 10;//(query[4]<<8 || query[5]);
+
+				/*if(dummy){
+					mb_mapping->tab_registers[45000] = 0x0000;	// 	DesignCapacity		0	0
+					mb_mapping->tab_registers[45001] = 0x0c00;	// 	DesignVoltage		3072	3072
+					mb_mapping->tab_registers[45002] = 0x435f;	// 	ManufactureDate		17247	17247
+					mb_mapping->tab_registers[45003] = 0x0012;	// 	SerialNumber		18	18
+					mb_mapping->tab_registers[45004] = 0x534f;	// 	ManufactureName		21327	21327
+					mb_mapping->tab_registers[45005] = 0x4335;	// 	DeviceName		17205	17205
+					mb_mapping->tab_registers[45006] = 0x4c46;	// 	DeviceChemistry		19526	19526
+					mb_mapping->tab_registers[45007] = 0x5001;	// 	ModelName		20481	20481
+					mb_mapping->tab_registers[45008] = 0x003f;	// 	ConnectedModuleInfo		63	63
+					mb_mapping->tab_registers[45009] = 0x1217;	// 	ControllerInfo		4631	4631
+					mb_mapping->tab_registers[45010] = 0x1701;	// 	FirmwareVersion		5889	5889
+					mb_mapping->tab_registers[45011] = 0x0010;	// 	Status		16	16
+					mb_mapping->tab_registers[45012] = 0x00c0;	// 	BatteryStatus		192	192
+					mb_mapping->tab_registers[45013] = 0x0c48;	// 	Voltage		3144	3144
+					mb_mapping->tab_registers[45014] = 0xffac;	// 	Current		-84	65452
+					mb_mapping->tab_registers[45015] = 0x0000;	// 	SysWarning		0	0
+					mb_mapping->tab_registers[45016] = 0x0cce;	// 	SysMaxCellVoltage		3278	3278
+					mb_mapping->tab_registers[45017] = 0x0cc8;	// 	SysMinCellVoltage		3272	3272
+					mb_mapping->tab_registers[45018] = 0x0b8e;	// 	Temperature		2958	2958
+					mb_mapping->tab_registers[45019] = 0x0027;	// 	RelativeStateOfCharge		39	39
+					mb_mapping->tab_registers[45020] = 0x03a2;	// 	RemainCapacity		930	930
+					mb_mapping->tab_registers[45021] = 0x0960;	// 	FullChargeCapacity		2400	2400
+					mb_mapping->tab_registers[45022] = 0xffc1;	// 	AverageCurrent		-63	65473
+					mb_mapping->tab_registers[45023] = 0x0960;	// 	ChargingCurrent		2400	2400
+					mb_mapping->tab_registers[45024] = 0x0d80;	// 	ChargingVoltage		3456	3456
+					mb_mapping->tab_registers[45025] = 0x002d;	// 	CycleCount		45	45
+					mb_mapping->tab_registers[45026] = 0x0000;	// 	HeaterStatus		0	0
+					mb_mapping->tab_registers[45027] = 0x0000;	// 	FANStatus		0	0
+					mb_mapping->tab_registers[45028] = 0x0ba9;	// 	SysMaxCellTemp		2985	2985
+					mb_mapping->tab_registers[45029] = 0x0b6a;	// 	SysMinCellTemp		2922	2922
+					mb_mapping->tab_registers[45030] = 0x0c00;	// 	HeatsinkTemperature		3072	3072
+					mb_mapping->tab_registers[45031] = 0xffff;	// 	IGBTControl		-1	65535
+					mb_mapping->tab_registers[45032] = 0x030f;	// 	IGBTStatus		783	783
+				}
+				else{
+					updateModbusMap(mb_mapping, m_RegisterList, query); // every request we want a new set of cards
+				}
+				*/
 
 				updateModbusMap(mb_mapping, m_RegisterList, query); // every request we want a new set of cards
 
