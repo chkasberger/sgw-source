@@ -35,6 +35,7 @@ struct Arguments {
 	    const char *argModbusType;
 	    const char *argModbusPort;
 	    bool DEBUG;
+	    bool dummy;
 	  };
 
 
@@ -198,6 +199,7 @@ void *startModbusConnection(void *arguments){
 	if(*args->argCount >= 1){
 		cout << "initiate modbus connection(s)!\r" << endl;
 			Modbus modbus = Modbus();
+			//modbus.dummy = args->dummy;
 			modbus.openServer(args->argModbusType,args->argModbusPort,&mtx,&m_Map.m_registerListController);
 	}
 
@@ -209,9 +211,9 @@ int main(int argc, char *argv[]) {
 
 	Arguments arguments, argsAlternative;
 	//*arguments.argCount = 5;
-	arguments.argSonyPort = "/dev/ttyUSB0";
-	arguments.argModbusType = "tcp";
-	arguments.argModbusPort = "502";
+	arguments.argSonyPort = "/dev/ttyUSB1";
+	arguments.argModbusType = "rtu";
+	arguments.argModbusPort = "dev/ttyUSB0";
 	//arguments.argModbusPort2 = "/dev/ttyUSB1";
 	arguments.DEBUG = false;
 
@@ -241,9 +243,10 @@ int main(int argc, char *argv[]) {
 				DEBUG = true;
 			}
 	  }
-	  if(argc > 5 && atoi(argv[4]) == 1){
-		  DEBUG = true;
+	  /*if(argc > 5 && atoi(argv[4]) == 1){
+		  arguments.dummy = true;
 	  }
+	  */
 	}
 
 	cout << "!!!Starting Gateway!!!\r" << endl; // prints !!!Hello World!!!
@@ -266,7 +269,11 @@ int main(int argc, char *argv[]) {
 		cout << "failed to open port\r" << endl;
 	}
 
-	 unsigned char c='D';
+	updateAllRegister(&m_Map.m_registerListBattActivation);
+
+
+	unsigned char c='D';
+
 	 while(c != 'q'){
 		read(STDIN_FILENO,&c,1);
 
@@ -276,27 +283,18 @@ int main(int argc, char *argv[]) {
 			DEBUG = false;
 		}
 
-		//if(c!='m'){
-			usleep(500000);
-			updateAllRegister(&m_Map.m_registerListController);
-		//}
-		//if(c=='m'){
-		if(DEBUG){
-			usleep(500000);
-			updateAllRegister(&m_Map.m_registerListModule);
-		}
+		//usleep(1000000);
+		//updateAllRegister(&m_Map.m_registerListControllerDummy);
+		//usleep(1000000);
+		//updateAllRegister(&m_Map.m_registerListModuleDummy);
 
-		/*for(unsigned int i = 0; i < 2; i++)
-		if (pthread_kill(threadArray[i], 0) == ESRCH){
-			cout << "threadModbus is not alive any more; try to restart!\r" << endl;
-			if(int rc = pthread_create(&threadArray[i],NULL, startModbusConnection, (void *)&arguments))
-				cout << "Error:unable to create thread, " << rc << endl;
+
+		usleep(500000);
+		updateAllRegister(&m_Map.m_registerListController);
+		if(DEBUG){
+			//usleep(500000);
+			//updateAllRegister(&m_Map.m_registerListModule);
 		}
-		*/
-	//int rc = pthread_create(&threads[1],NULL, startModbusConnection, (void *)1);
-		//usleep(300000);
-		//updateAllRegister(&m_Map.m_registerListModule);
-		//system("stty sane");
 
 	}
 

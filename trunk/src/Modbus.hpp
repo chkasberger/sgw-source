@@ -36,6 +36,8 @@ namespace sgw {
 class Modbus {
 public:
 	bool DEBUG = false;
+	//bool dummy = false;
+
 	Modbus();
 	virtual ~Modbus();
 	void openServer(const char *mode, const char *port, pthread_mutex_t *mtx, list<Register*> *l);
